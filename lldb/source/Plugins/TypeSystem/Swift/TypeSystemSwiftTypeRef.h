@@ -136,6 +136,7 @@ public:
   GetMemberFunctionAtIndex(lldb::opaque_compiler_type_t type,
                            size_t idx) override;
   CompilerType GetPointeeType(lldb::opaque_compiler_type_t type) override;
+  /// Predicate for BuiltinRawPointer. Other types result in an invalid type.
   CompilerType GetPointerType(lldb::opaque_compiler_type_t type) override;
 
   // Exploring the type

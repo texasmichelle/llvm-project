@@ -1632,9 +1632,20 @@ CompilerType
 TypeSystemSwiftTypeRef::GetPointeeType(opaque_compiler_type_t type) {
   return m_swift_ast_context->GetPointeeType(ReconstructType(type));
 }
+
 CompilerType
 TypeSystemSwiftTypeRef::GetPointerType(opaque_compiler_type_t type) {
-  return m_swift_ast_context->GetPointerType(ReconstructType(type));
+  auto impl = [&]() -> CompilerType {
+    using namespace swift::Demangle;
+    Demangler Dem;
+    auto *node = DemangleCanonicalType(Dem, type);
+    if (node && node->getKind() == Node::Kind::BuiltinTypeName &&
+        node->hasText() &&
+        node->getText() == swift::BUILTIN_TYPE_NAME_RAWPOINTER)
+      return RemangleAsType(Dem, node);
+    return {};
+  };
+  VALIDATE_AND_RETURN(impl, GetPointerType, type, (ReconstructType(type)));
 }
 
 // Exploring the type
